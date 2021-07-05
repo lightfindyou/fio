@@ -122,6 +122,7 @@ void __fill_random_buf(void *buf, unsigned int len, uint64_t seed)
 	}
 }
 
+//xzjin Important for generage random buffer.
 uint64_t fill_random_buf(struct frand_state *fs, void *buf,
 			 unsigned int len)
 {

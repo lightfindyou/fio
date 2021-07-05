@@ -18,50 +18,48 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+ * USA.
  *
  */
 #include "fio.h"
 
-int main(int argc, char *argv[], char *envp[])
-{
-	int ret = 1;
+int main(int argc, char *argv[], char *envp[]) {
+    int ret = 1;
 
-	compiletime_assert(TD_NR <= TD_ENG_FLAG_SHIFT, "TD_ENG_FLAG_SHIFT");
+    compiletime_assert(TD_NR <= TD_ENG_FLAG_SHIFT, "TD_ENG_FLAG_SHIFT");
 
-	if (initialize_fio(envp))
-		return 1;
+    if (initialize_fio(envp)) return 1;
 
 #if !defined(CONFIG_GETTIMEOFDAY) && !defined(CONFIG_CLOCK_GETTIME)
 #error "No available clock source!"
 #endif
 
-	if (fio_server_create_sk_key())
-		goto done;
+    if (fio_server_create_sk_key()) goto done;
 
-	if (parse_options(argc, argv))
-		goto done_key;
+    if (parse_options(argc, argv)) goto done_key;
 
-	/*
-	 * line buffer stdout to avoid output lines from multiple
-	 * threads getting mixed
-	 */
-	setvbuf(stdout, NULL, _IOLBF, 0);
+    /*
+     * line buffer stdout to avoid output lines from multiple
+     * threads getting mixed
+     */
+    setvbuf(stdout, NULL, _IOLBF, 0);
 
-	fio_time_init();
+    fio_time_init();
 
-	if (nr_clients) {
-		set_genesis_time();
+    if (nr_clients) {
+        set_genesis_time();
+        printf("nr_clints\n");
 
-		if (fio_start_all_clients())
-			goto done_key;
-		ret = fio_handle_clients(&fio_client_ops);
-	} else
-		ret = fio_backend(NULL);
+        if (fio_start_all_clients()) goto done_key;
+        ret = fio_handle_clients(&fio_client_ops);
+    } else
+        printf("fio_backend.\n");
+        ret = fio_backend(NULL);
 
 done_key:
-	fio_server_destroy_sk_key();
+    fio_server_destroy_sk_key();
 done:
-	deinitialize_fio();
-	return ret;
+    deinitialize_fio();
+    return ret;
 }

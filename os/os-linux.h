@@ -374,7 +374,7 @@ static inline ssize_t pwritev2(int fd, const struct iovec *iov, int iovcnt,
 			       off_t offset, unsigned int flags)
 {
 	unsigned long pos_l, pos_h;
-
+	printf("xzjin pwritev, %d.\n", __LINE__);
 	make_pos_h_l(&pos_h, &pos_l, offset);
 	return syscall(__NR_pwritev2, fd, iov, iovcnt, pos_l, pos_h, flags);
 }
@@ -388,6 +388,7 @@ static inline ssize_t preadv2(int fd, const struct iovec *iov, int iovcnt,
 static inline ssize_t pwritev2(int fd, const struct iovec *iov, int iovcnt,
 			       off_t offset, unsigned int flags)
 {
+	printf("xzjin pwritev, %d.\n", __LINE__);
 	errno = ENOSYS;
 	return -1;
 }

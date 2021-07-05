@@ -2168,6 +2168,7 @@ void io_u_queued(struct thread_data *td, struct io_u *io_u)
 
 /*
  * See if we should reuse the last seed, if dedupe is enabled
+ * xzjin
  */
 static struct frand_state *get_buf_state(struct thread_data *td)
 {
