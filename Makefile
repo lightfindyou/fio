@@ -6,6 +6,9 @@ VPATH := $(SRCDIR)
 
 all: fio
 
+#debug: CPPFLAGS+= -ggdb 
+debug: fio
+
 config-host.mak: configure
 	@if [ ! -e "$@" ]; then					\
 	  echo "Running configure ...";				\
@@ -33,6 +36,11 @@ endif
 ifdef CONFIG_BUILD_NATIVE
   FIO_CFLAGS += -march=native
 endif
+
+### Start add by xzjin
+LDFLAGS += -lawn
+#CPPFLAGS += -ggdb 
+### End add by xzjin
 
 ifdef CONFIG_PDB
   LINK_PDBFILE ?= -Wl,-pdb,$(dir $@)/$(basename $(@F)).pdb

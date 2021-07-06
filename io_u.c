@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
+#include <awn/awn.h>
 
 #include "fio.h"
 #include "verify.h"
@@ -12,6 +13,7 @@
 #include "minmax.h"
 #include "zbd.h"
 
+static int dedupBuf = 0;
 struct io_completion_data {
 	int nr;				/* input */
 
@@ -2174,17 +2176,21 @@ static struct frand_state *get_buf_state(struct thread_data *td)
 {
 	unsigned int v;
 
-	if (!td->o.dedupe_percentage)
+	dedupBuf = 0;
+	if (!td->o.dedupe_percentage){
 		return &td->buf_state;
-	else if (td->o.dedupe_percentage == 100) {
+	} else if (td->o.dedupe_percentage == 100) {
+		dedupBuf = 1;
 		frand_copy(&td->buf_state_prev, &td->buf_state);
 		return &td->buf_state;
 	}
 
 	v = rand_between(&td->dedupe_state, 1, 100);
 
-	if (v <= td->o.dedupe_percentage)
+	if (v <= td->o.dedupe_percentage){
+		dedupBuf = 1;
 		return &td->buf_state_prev;
+	}
 
 	return &td->buf_state;
 }
@@ -2210,7 +2216,6 @@ void fill_io_buffer(struct thread_data *td, void *buf, unsigned long long min_wr
 		struct frand_state *rs;
 		unsigned long long left = max_bs;
 		unsigned long long this_write;
-
 		do {
 			rs = get_buf_state(td);
 
@@ -2220,12 +2225,23 @@ void fill_io_buffer(struct thread_data *td, void *buf, unsigned long long min_wr
 				this_write = min_not_zero(min_write,
 							(unsigned long long) td->o.compress_chunk);
 
+				//printf("\nxzjin dedup percent, fill_random_buf_percentage\n");
 				fill_random_buf_percentage(rs, buf, perc,
 					this_write, this_write,
 					o->buffer_pattern,
 					o->buffer_pattern_bytes);
 			} else {
-				fill_random_buf(rs, buf, min_write);
+				if( dedupBuf /*0*/){
+					//printf("\nxzjin 2 dedup percent, fill_random_buf\n");
+					__rand(rs);
+					if (sizeof(int) != sizeof(long *))
+						__rand(rs);
+					lseek(bufSrcfd, 0, SEEK_SET);
+					ts_read(bufSrcfd, buf, min_write);
+				}else{
+					//printf("\nxzjin 1 dedup percent, fill_random_buf\n");
+					fill_random_buf(rs, buf, min_write);
+				}
 				this_write = min_write;
 			}
 
@@ -2233,12 +2249,16 @@ void fill_io_buffer(struct thread_data *td, void *buf, unsigned long long min_wr
 			left -= this_write;
 			save_buf_state(td, rs);
 		} while (left);
-	} else if (o->buffer_pattern_bytes)
+	} else if (o->buffer_pattern_bytes){
+		//printf("\nxzjin buffer pattern\n");
 		fill_buffer_pattern(td, buf, max_bs);
-	else if (o->zero_buffers)
+	} else if (o->zero_buffers){
+		//printf("\nxzjin zeroed buffers\n");
 		memset(buf, 0, max_bs);
-	else
+	} else{
+		//printf("\nxzjin fill random buffer\n");
 		fill_random_buf(get_buf_state(td), buf, max_bs);
+	}
 }
 
 /*

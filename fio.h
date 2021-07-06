@@ -11,8 +11,11 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <inttypes.h>
 #include <assert.h>
+#include <awn/awn.h>
 
 #include "compiler/compiler.h"
 #include "thread_options.h"
@@ -68,6 +71,9 @@
 #include <cuda.h>
 #endif
 
+int bufSrcfd;
+void* bufSrc;
+unsigned long MAXMEMCPY;
 struct fio_sem;
 
 /*

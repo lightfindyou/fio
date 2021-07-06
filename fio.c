@@ -26,7 +26,27 @@
 
 int main(int argc, char *argv[], char *envp[]) {
     int ret = 1;
+    {
+        int err;
+        struct stat st;
 
+        bufSrcfd = ts_open("/home/xzjin/FIO_COPY_SRC", O_RDONLY);
+        err = errno;
+        if(bufSrcfd<=0){
+            printf("Open buf src file error, %s\n", strerror(err));
+            return -1;
+        }
+    
+        if(fstat(bufSrcfd, &st)){
+            err = errno;
+    		printf("Get file stat failed %s.\n", strerror(err));
+            return -1;
+        }
+
+        MAXMEMCPY = st.st_size;
+        bufSrc = ts_mmap(0, MAXMEMCPY, PROT_READ,
+            MAP_PRIVATE, bufSrcfd, 0);
+    }
     compiletime_assert(TD_NR <= TD_ENG_FLAG_SHIFT, "TD_ENG_FLAG_SHIFT");
 
     if (initialize_fio(envp)) return 1;

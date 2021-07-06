@@ -77,7 +77,7 @@ static struct ioengine_ops *find_ioengine(const char *name)
 {
 	struct ioengine_ops *ops;
 	struct flist_head *entry;
-	printf("xzjin IOengine name:%s\n", name);
+	//printf("xzjin IOengine name:%s\n", name);
 	flist_for_each(entry, &engine_list) {
 		ops = flist_entry(entry, struct ioengine_ops, list);
 		if (!strcmp(name, ops->name))

@@ -2421,9 +2421,12 @@ reap:
 				dprint(FD_PROCESS, "will fork\n");
 				pid = fork();
 				if (!pid) {
+					//xzjin subprocess code and exit point
 					int ret;
 
 					ret = (int)(uintptr_t)thread_main(fd);
+
+					ts_print_statistics();
 					_exit(ret);
 				} else if (i == fio_debug_jobno)
 					*fio_debug_jobp = pid;

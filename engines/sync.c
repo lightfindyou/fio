@@ -201,14 +201,14 @@ static enum fio_q_status fio_psyncio_queue(struct thread_data *td,
 	struct fio_file *f = io_u->file;
 	int ret;
 
-	printf("xzjin %s , %d.\n", __func__, __LINE__);
+	//printf("xzjin %s , %d.\n", __func__, __LINE__);
 	fio_ro_check(td, io_u);
 
 	if (io_u->ddir == DDIR_READ){
-		printf("xzjin pread , %d.\n", __LINE__);
+		//printf("xzjin pread , %d.\n", __LINE__);
 		ret = pread(f->fd, io_u->xfer_buf, io_u->xfer_buflen, io_u->offset);
 	} else if (io_u->ddir == DDIR_WRITE){
-		printf("xzjin pwrite, %d.\n", __LINE__);
+		//printf("xzjin pwrite, %d.\n", __LINE__);
 		//ret = pwrite(f->fd, io_u->xfer_buf, io_u->xfer_buflen, io_u->offset);
 		ret = ts_pwrite(f->fd, io_u->xfer_buf, io_u->xfer_buflen, io_u->offset);
 	} else if (io_u->ddir == DDIR_TRIM) {
