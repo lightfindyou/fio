@@ -26,9 +26,11 @@
 
 int main(int argc, char *argv[], char *envp[]) {
     int ret = 1;
+    int err;
+    struct stat st;
+    compiletime_assert(TD_NR <= TD_ENG_FLAG_SHIFT, "TD_ENG_FLAG_SHIFT");
+
     {
-        int err;
-        struct stat st;
 
         bufSrcfd = ts_open("/home/xzjin/FIO_COPY_SRC", O_RDONLY);
         err = errno;
@@ -47,8 +49,6 @@ int main(int argc, char *argv[], char *envp[]) {
         bufSrc = ts_mmap(0, MAXMEMCPY, PROT_READ,
             MAP_PRIVATE, bufSrcfd, 0);
     }
-    compiletime_assert(TD_NR <= TD_ENG_FLAG_SHIFT, "TD_ENG_FLAG_SHIFT");
-
     if (initialize_fio(envp)) return 1;
 
 #if !defined(CONFIG_GETTIMEOFDAY) && !defined(CONFIG_CLOCK_GETTIME)
@@ -73,9 +73,10 @@ int main(int argc, char *argv[], char *envp[]) {
 
         if (fio_start_all_clients()) goto done_key;
         ret = fio_handle_clients(&fio_client_ops);
-    } else
+    } else{
         printf("fio_backend.\n");
         ret = fio_backend(NULL);
+    }
 
 done_key:
     fio_server_destroy_sk_key();
