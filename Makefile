@@ -4,10 +4,11 @@ endif
 
 VPATH := $(SRCDIR)
 
-all: fio
+#all: fio
+all: fio_modified
 
 #debug: CPPFLAGS+= -ggdb 
-debug: fio
+#debug: fio
 
 config-host.mak: configure
 	@if [ ! -e "$@" ]; then					\
@@ -27,7 +28,7 @@ CPPFLAGS= -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DFIO_INTERNAL $(DEBUGFLAGS
 OPTFLAGS= -g -ffast-math
 FIO_CFLAGS= -std=gnu99 -Wwrite-strings -Wall -Wdeclaration-after-statement $(OPTFLAGS) $(EXTFLAGS) $(BUILD_CFLAGS) -I. -I$(SRCDIR)
 LIBS	+= -lm $(EXTLIBS)
-PROGS	= fio
+PROGS	= fio_modified
 SCRIPTS = $(addprefix $(SRCDIR)/,tools/fio_generate_plots tools/plot/fio2gnuplot tools/genfio tools/fiologparser.py tools/hist/fiologparser_hist.py tools/hist/fio-histo-log-pctiles.py tools/fio_jsonplus_clat2csv)
 
 ifndef CONFIG_FIO_NO_OPT
@@ -36,11 +37,6 @@ endif
 ifdef CONFIG_BUILD_NATIVE
   FIO_CFLAGS += -march=native
 endif
-
-### Start add by xzjin
-LDFLAGS += -lawn
-#CPPFLAGS += -ggdb 
-### End add by xzjin
 
 ifdef CONFIG_PDB
   LINK_PDBFILE ?= -Wl,-pdb,$(dir $@)/$(basename $(@F)).pdb
@@ -288,6 +284,12 @@ ifneq (,$(findstring CYGWIN,$(CONFIG_TARGET_OS)))
   FIO_CFLAGS += -DPSAPI_VERSION=1 -Ios/windows/posix/include -Wno-format
 endif
 
+### Start add by xzjin
+#LDFLAGS += -lawn
+LIBS += -lawn
+#CPPFLAGS += -lawn
+### End add by xzjin
+
 ifdef CONFIG_DYNAMIC_ENGINES
  DYNAMIC_ENGS := $(ENGINES)
 define engine_template =
@@ -466,6 +468,7 @@ UT_TARGET_OBJS =
 UT_PROGS =
 endif
 
+V=1
 ifneq ($(findstring $(MAKEFLAGS),s),s)
 ifndef V
 	QUIET_CC	= @echo '   ' CC $@;
@@ -589,6 +592,9 @@ t/ieee754: $(T_IEEE_OBJS)
 	$(QUIET_LINK)$(CC) $(LDFLAGS) -o $@ $(T_IEEE_OBJS) $(LIBS)
 
 fio: $(FIO_OBJS)
+	$(QUIET_LINK)$(CC) $(LDFLAGS) -o $@ $(FIO_OBJS) $(LIBS) $(HDFSLIB)
+
+fio_modified: $(FIO_OBJS)
 	$(QUIET_LINK)$(CC) $(LDFLAGS) -o $@ $(FIO_OBJS) $(LIBS) $(HDFSLIB)
 
 t/fuzz/fuzz_parseini: $(T_FUZZ_OBJS)
