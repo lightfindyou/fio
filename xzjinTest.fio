@@ -1,0 +1,8 @@
+[global]
+size=200M
+loops=1
+dedupe_percentage=40
+
+[SSD-rand]
+rw=randwrite
+directory=/home/xzjin/tmp
