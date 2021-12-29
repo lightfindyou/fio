@@ -1948,6 +1948,9 @@ static void *thread_main(void *data)
 
 	if (exitall_on_terminate || (o->exitall_error && td->error))
 		fio_terminate_threads(td->groupid, td->o.exit_what);
+	printf("------------------------------------------------------");
+	my_fini();
+	printf("------------------------------------------------------");
 
 err:
 	if (td->error)

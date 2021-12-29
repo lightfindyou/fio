@@ -21,11 +21,40 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  */
+#include <dlfcn.h>
 #include "fio.h"
 
 int main(int argc, char *argv[], char *envp[])
 {
 	int ret = 1;
+	void* shareLib = NULL;
+	shareLib = dlopen("/home/xzjin/Documents/destor/src/.libs/libentrance.so.0.0.0", RTLD_LAZY);
+	if(!shareLib){
+		printf("open lib error.\n%s", dlerror());
+		return -1;
+	}
+
+	my_pwrite = NULL;
+	my_pwrite = dlsym(shareLib, "xzjin_pwrite");
+	if(!my_pwrite){
+		printf("search my_pwrite error.\n%s", dlerror());
+		return -1;
+	}
+
+	my_init = NULL;
+	my_init = dlsym(shareLib, "init");
+	if(!my_init){
+		printf("search my_init error.\n%s", dlerror());
+		return -1;
+	}
+	my_init();
+
+	my_fini = NULL;
+	my_fini = dlsym(shareLib, "fini");
+	if(!my_fini){
+		printf("search my_fini error.\n%s", dlerror());
+		return -1;
+	}
 
 	compiletime_assert(TD_NR <= TD_ENG_FLAG_SHIFT, "TD_ENG_FLAG_SHIFT");
 

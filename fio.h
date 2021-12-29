@@ -676,6 +676,10 @@ static inline bool td_ioengine_flagged(struct thread_data *td,
 	return ((td->flags >> TD_ENG_FLAG_SHIFT) & flags) != 0;
 }
 
+ssize_t (*my_pwrite)(int fd, const void *buf, size_t count, off_t offset);
+void (*my_init)();
+void (*my_fini)();
+
 extern void td_set_runstate(struct thread_data *, int);
 extern int td_bump_runstate(struct thread_data *, int);
 extern void td_restore_runstate(struct thread_data *, int);

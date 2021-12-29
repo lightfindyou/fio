@@ -194,7 +194,7 @@ static enum fio_q_status fio_pvsyncio2_queue(struct thread_data *td,
 }
 #endif
 
-static enum fio_q_status fio_psyncio_queue(struct thread_data *td,
+enum fio_q_status fio_psyncio_queue(struct thread_data *td,
 					   struct io_u *io_u)
 {
 	struct fio_file *f = io_u->file;
@@ -204,8 +204,10 @@ static enum fio_q_status fio_psyncio_queue(struct thread_data *td,
 
 	if (io_u->ddir == DDIR_READ)
 		ret = pread(f->fd, io_u->xfer_buf, io_u->xfer_buflen, io_u->offset);
-	else if (io_u->ddir == DDIR_WRITE)
-		ret = pwrite(f->fd, io_u->xfer_buf, io_u->xfer_buflen, io_u->offset);
+	else if (io_u->ddir == DDIR_WRITE){
+		ret = my_pwrite(f->fd, io_u->xfer_buf, io_u->xfer_buflen, io_u->offset);
+//		ret = pwrite(f->fd, io_u->xfer_buf, io_u->xfer_buflen, io_u->offset);
+	}
 	else if (io_u->ddir == DDIR_TRIM) {
 		do_io_u_trim(td, io_u);
 		return FIO_Q_COMPLETED;
